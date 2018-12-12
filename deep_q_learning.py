@@ -22,13 +22,14 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('train_dir', 'tf_train_breakout',
                            """Directory where to write event logs and checkpoint. """)
 tf.app.flags.DEFINE_string('restore_file_path',
-                           '/home/boyuanf/DeepQLearning/tf_train_breakout/breakout_model_20180610205843_36h_12193ep_sec_version.h5',
+                           '/Users/Aakash/Dropbox/CSCI 3202/Final_Project/DeepQLearning/tf_train_breakout/breakout_model_20180610205843_36h_12193ep_sec_version.h5',
                            """Path of the restore file """)
-tf.app.flags.DEFINE_integer('num_episode', 100000,
+tf.app.flags.DEFINE_integer('num_episode', 10,
                             """number of epochs of the optimization loop.""")
-# tf.app.flags.DEFINE_integer('observe_step_num', 5000,
+# tf.app.flags.DEFINE_integer('FLAGS.observe_step_num', 5000,
 tf.app.flags.DEFINE_integer('observe_step_num', 50000,
                             """Timesteps to observe before training.""")
+
 # tf.app.flags.DEFINE_integer('epsilon_step_num', 50000,
 tf.app.flags.DEFINE_integer('epsilon_step_num', 1000000,
                             """frames over which to anneal epsilon.""")
@@ -124,20 +125,22 @@ def store_memory(memory, history, action, reward, next_history, dead):
 
 
 def get_one_hot(targets, nb_classes):
+    # np.eye takes list, returns its one-hot-encoded 2d array
     return np.eye(nb_classes)[np.array(targets).reshape(-1)]
 
 
 # train model by radom batch
 def train_memory_batch(memory, model, log_dir):
     mini_batch = random.sample(memory, FLAGS.batch_size)
-    history = np.zeros((FLAGS.batch_size, ATARI_SHAPE[0],
-                        ATARI_SHAPE[1], ATARI_SHAPE[2]))
+    history = np.zeros((FLAGS.batch_size, ATARI_SHAPE[0], 
+                        ATARI_SHAPE[1], ATARI_SHAPE[2])) 
     next_history = np.zeros((FLAGS.batch_size, ATARI_SHAPE[0],
                              ATARI_SHAPE[1], ATARI_SHAPE[2]))
     target = np.zeros((FLAGS.batch_size,))
     action, reward, dead = [], [], []
 
     for idx, val in enumerate(mini_batch):
+        print(val[0].shape)
         history[idx] = val[0]
         next_history[idx] = val[3]
         action.append(val[1])
@@ -284,6 +287,7 @@ def train():
                 #if episode_number % 1 == 0 or (episode_number + 1) == FLAGS.num_episode:  # debug
                     now = datetime.utcnow().strftime("%Y%m%d%H%M%S")
                     file_name = "breakout_model_{}.h5".format(now)
+
                     model_path = os.path.join(FLAGS.train_dir, file_name)
                     model.save(model_path)
 
@@ -372,7 +376,7 @@ def test():
 
 
 def main(argv=None):
-    # train()
+    train()
     test()
 
 
