@@ -27,7 +27,7 @@ PROJECT_DIR = os.getcwd()
 #Directory where to write event logs and checkpoint.
 TRAIN_DIR = 'tf_train_breakout'
 # Path of the restore file
-RESTORE_FILE_PATH = PROJECT_DIR+'/'+TRAIN_DIR+'/breakout_model_20181212075635.h5'
+RESTORE_FILE_PATH = PROJECT_DIR+'/'+TRAIN_DIR+'/breakout_model_20181212174557.h5'
 
 # Repeat each action selected by the agent this many times.
 # Using a value of 4 results in the agent seeing only every 4th input frame
@@ -58,9 +58,9 @@ MIN_SQUARED_GRADIENT = 0.01
 # Maximum number of "do nothing" actions to be performed by the agent at the start of an episode
 NO_OP_MAX = 30
 # number of epochs of the optimization loop.""")
-NUM_EPISODES = 100000
+NUM_EPISODES = 1000
 # Timesteps to observe before training.""")
-OBSERVE_STEP_NUM = 1000
+OBSERVE_STEP_NUM = 50000
 # A uniform random policy is run for this number of frames before learning starts and the resulting experience is used to populate the replay memory
 REPLAY_START_SIZE = 50000
 # Squared gradient (denominator) momentum used by RMSProp
@@ -389,12 +389,12 @@ def run_model():
             time.sleep(0.01) # Need delay for render to load
 
             # gets action index for the current
-            action = get_action(history, epsilon, n_global_count, model) + 1
+            action = get_action(history, epsilon, n_global_count, model)
 
             # Play one game iteration (note: according to the next paper, you should actually play 4 times here)
-            new_frame, reward, is_done, info = env.step(action)
+            state, reward, is_done, info = env.step(action + 1)
 
-            next_state = pre_processing(new_frame)
+            next_state = pre_processing(state)
             next_state = np.reshape([next_state], (1, 84, 84, 1))
             next_history = np.append(next_state, history[:, :, :, :3], axis=3)
 
@@ -420,5 +420,5 @@ def run_model():
     file.close()
 if __name__ == "__main__":
     # print("test")
-    train_model()
-    # run_model()
+    # train_model()
+    run_model()
